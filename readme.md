@@ -19,7 +19,7 @@ You will need:
 ### Preparing an image
 
 First, you must download an official recovery image for your device.
-You can download them from [ChromiumDash](https://chromiumdash.appspot.com/serving-builds?deviceCategory=Chrome%20OS) or [Chrome100](https://chrome100.dev/).  
+You can download them from [ChromiumDash](https://chromiumdash.appspot.com/serving-builds?deviceCategory=Chrome%20OS) or [cros.download](https://cros.download/recovery).  
 See [modes of operation](#modes-of-operation) for which version you'll need, usually r124 or older.
 Be sure you've downloaded the correct image for your device.
 

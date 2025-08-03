@@ -55,14 +55,14 @@ which is used on devices manufactured in 2022 or later.
 The difference between the first 2 is negligible; the default size of the rootfs partitions was changed from 2 GiB to 4 GiB.
 The v3 disk layout reorders some partitions, and adds new partitions (MINIOS-A/B and POWERWASH-DATA).
 
-While looking at the layouts (primary legacy and v2), you may notice that the user data partition (STATE/stateful) is situated
+While looking at the layouts (primarily legacy and v2), you may notice that the user data partition (STATE/stateful) is situated
 immediately after ROOT-A. Great, that means we can overflow data from ROOT-A into stateful, right? Well, kind of.
 
 An optimization was added to chromeos-install in [r86](https://crrev.com/c/2330304), which splits the rootfs copied from the USB drive to the internal drive into 4 chunks.
 This allows the recovery process to be faster overall, as it takes advantage of the disk cache to avoid copying the same data twice.
 (As remember, ROOT-A of the USB drive is copied to both ROOT-A and ROOT-B of the internal disk)
 However, this creates an issue. While we can still overflow data into stateful, ROOT-A ends up with an exact copy of the data on stateful.
-This makes the system unable to boot into ChromeOS after recovery, as ROOT-A is always first rootfs booted after recovery.
+This makes the system unable to boot into ChromeOS after recovery, as ROOT-A is always the first rootfs booted after recovery.
 
 ![image](assets/images/chunked.jpg)  
 Chunks being copied to the disk in a normal recovery image, and chunks being copied to the disk when ROOT-A has been expanded.
@@ -71,7 +71,7 @@ And a turtle.
 So, in other words, arbitrary data could be written to the stateful partition on r85 recovery images or older.
 Or, a rather inconvenient workaround could be used: expanding ROOT-A on the USB drive by 4x.
 This is inconvenient because ROOT-A goes from 4 GiB to 16 GiB, or 2 GiB to 8 GiB on older devices with smaller rootfs partitions.
-This makes the total image size up to 17 GiB.
+This takes the maximum image size up to 17 GiB.
 
 ![image](assets/images/chunked_workaround.jpg)
 
@@ -105,7 +105,7 @@ However, it could be used to unenroll almost every EOL device (at the time of wr
 
 Another potential option would be to try to get some kind of code execution persistence, which Rory McNamara has discovered a few of in the past.
 
-The first thing I tried was his chronos (non-root account) persistence via custom device policy. (https://crbug.com/1072233)
+The first thing I tried was his chronos (non-root account) [persistence](https://crbug.com/1072233) via custom device policy.
 I created a script that would be called by chrome when it reads the device policy.
 The script would relaunch chrome with the `--ui-show-fps-counter` command line flag so it would be easy to tell if my code was running.
 
@@ -138,9 +138,9 @@ Later, as I was looking through Rory's vulnerability reports again, I saw 2 that
 The first may seem perfect, though unfortunately it only works on a specific release of r93, one which doesn't even have a recovery image.
 
 The last part of the second report, "disk access to root command execution", was also interesting. "Disk access" here meant access to certain directories on
-stateful and encstateful, which we have full control over. The only issue is that, replacing `/var/cache` with a symlink as done in the bug report, chromeos_startup
+stateful and encstateful, which we have full control over. The only issue is that, when `/var/cache` is replaced with a symlink as done in the bug report, chromeos_startup
 detects the anomaly and and clobbers stateful on boot. (This is not an issue in the bug report because it is not being used for persistence, rather only being used
-while the system is already running).
+while the system is already running.)
 
 However, before [r90](https://crrev.com/c/2696308), it turned out to be possible to use `/var/cache/external_cache` as the symlink, which did not interfere with chromeos_startup.
 It may be interesting to note that the ChromiumOS LSM actually enabled this to work, as it causes the `-d "${TO}"` to return false (`${TO}` is the symlink to the directory).
