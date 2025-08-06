@@ -149,9 +149,6 @@ detect_image_features() {
 		fail "Could not find image version."
 	fi
 	log_info "Detected version: $IMAGE_VERSION"
-	if [ $IMAGE_VERSION -gt 124 ]; then
-		fail "Image version is too new. Please use an image for r124 or older."
-	fi
 
 	TARGET_ARCH=x86
 	if [ -f "$MNT_ROOT/bin/bash" ]; then
